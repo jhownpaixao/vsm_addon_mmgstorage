@@ -107,6 +107,14 @@ modded class mmg_storage_placeable_base
         return false;
     }
 
+    bool CanDisplayAttachmentCategory( string category_name )
+	{
+		if (VSM_CanManipule())
+            return super.CanDisplayAttachmentCategory(category_name);
+
+        return false;
+	}
+
     //! virtualização
     override bool VSM_CanVirtualize()
     {
