@@ -103,47 +103,31 @@ modded class mmg_gear_stand_base
 
     override void VSM_Open()
 	{
-        if(VSM_IsProcessing())
+        if(VSM_CanOpen())
         {
-            VirtualUtils.OnLocalPlayerSendMessage("Items are being generated, please wait...");
-            return;
+            super.VSM_Open();
+
+           
+            m_Openable.Open();
+            SetSynchDirty();
+
+            if (GetGame().IsServer())
+                VirtualStorageModule.GetModule().OnLoadVirtualStore(this);      
         }
-        
-        super.VSM_Open();
-
-		if (!VSM_IsOpen())
-		{
-			m_Openable.Open();
-
-			if (GetGame().IsServer())
-				VirtualStorageModule.GetModule().OnLoadVirtualStore(this);
-			SetSynchDirty();
-		}
 	}
 
 	override void VSM_Close()
 	{
-        if(VSM_IsProcessing())
+        if(VSM_CanClose())
         {
-            VirtualUtils.OnLocalPlayerSendMessage("Items are being generated, please wait...");
-            return;
-        }
+            super.VSM_Close();
 
-        super.VSM_Close();
-
-		if (VSM_IsAttachedOnVehicle())
-		{
-			VSM_StartAutoClose(); //reinicia ciclo
-			return;
-		}
-        else if (VSM_IsOpen())
-		{
-			if (GetGame().IsServer())
+            if (GetGame().IsServer())
 				VirtualStorageModule.GetModule().OnSaveVirtualStore(this);
 
-			m_Openable.Close();
+            m_Openable.Close();
 			SetSynchDirty();
-		}
+        }
 	}
 
     override void EEInit()

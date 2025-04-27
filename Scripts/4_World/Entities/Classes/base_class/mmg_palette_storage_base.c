@@ -19,40 +19,29 @@ modded class mmg_palette_storage_base
     }
 
     override void Open()
-	{
-		if(VSM_IsProcessing())
+    {
+        if (VSM_CanOpen())
         {
-            VirtualUtils.OnLocalPlayerSendMessage("Items are being generated, please wait...");
-            return;
-        }
+            m_Openable.Open();
+            SetSynchDirty();
 
-        m_Openable.Open();
-		SetSynchDirty();
-
-        if (GetGame().IsServer())
-        {
-            VirtualStorageModule.GetModule().OnLoadVirtualStore(this);
+            if (GetGame().IsServer())
+                VirtualStorageModule.GetModule().OnLoadVirtualStore(this);
         }
-	}
+    }
 
     override void Close()
-	{
+    {
 
-		if(VSM_IsProcessing())
+        if (VSM_CanClose())
         {
-            VirtualUtils.OnLocalPlayerSendMessage("Items are being generated, please wait...");
-            return;
+            if (GetGame().IsServer())
+                VirtualStorageModule.GetModule().OnSaveVirtualStore(this);
+            
+            m_Openable.Close();
+            SetSynchDirty();
         }
-        
-        if (GetGame().IsServer())
-        {
-            VirtualStorageModule.GetModule().OnSaveVirtualStore(this);
-            VSM_StopAutoClose();
-        }
-
-        m_Openable.Close();
-		SetSynchDirty();
-	}
+    }
 
     //! virtualização
     override bool VSM_IsOpen()

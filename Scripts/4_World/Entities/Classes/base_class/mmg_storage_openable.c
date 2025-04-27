@@ -7,37 +7,24 @@ modded class mmg_storage_openable_base
     
 	override void Open()
 	{
-		if(VSM_IsProcessing())
+        if (VSM_CanOpen())
         {
+            super.Open();
 
-            VirtualUtils.OnLocalPlayerSendMessage("Items are being generated, please wait...");
-            return;
-        }
-          
-        super.Open();
-
-        if (GetGame().IsServer())
-        {
-            VirtualStorageModule.GetModule().OnLoadVirtualStore(this);
+            if (GetGame().IsServer() && VSM_IsOpen())
+                VirtualStorageModule.GetModule().OnLoadVirtualStore(this);
         }
 	}
 
 	override void Close()
-	{
-
-		if(VSM_IsProcessing())
+	{ 
+        if (VSM_CanClose())
         {
-            VirtualUtils.OnLocalPlayerSendMessage("Items are being generated, please wait...");
-            return;
+            if (GetGame().IsServer())
+                VirtualStorageModule.GetModule().OnSaveVirtualStore(this);
+            
+            super.Close();
         }
-        
-        if (GetGame().IsServer())
-        {
-            VirtualStorageModule.GetModule().OnSaveVirtualStore(this);
-            VSM_StopAutoClose();
-        }
-
-        super.Close();
 	}
 
 	//! mesclar caracteristicas do storage para virtual
@@ -57,7 +44,6 @@ modded class mmg_storage_openable_base
         return !VSM_HasVirtualItems();
     }
 
-    // so aceita itens se estiver aberto
     override bool CanReceiveItemIntoCargo(EntityAI item)
     {
         if (VSM_CanManipule())
@@ -129,10 +115,9 @@ modded class mmg_storage_openable_base
     override void VSM_Open()
     {
         super.VSM_Open();
+
         if (!VSM_IsOpen())
-        {
             Open();
-        }
     }
 
     override void VSM_Close()
@@ -140,9 +125,7 @@ modded class mmg_storage_openable_base
         super.VSM_Close();
 
         if (VSM_IsOpen())
-        {
            	Close();
-        }
     }
 
     override void EEInit()
@@ -164,6 +147,7 @@ modded class mmg_storage_openable_base
     override void OnDamageDestroyed(int oldLevel)
 	{
 		super.OnDamageDestroyed(oldLevel);
+
 		if (GetGame().IsServer())
             VirtualStorageModule.GetModule().OnDestroyed(this);
 	};

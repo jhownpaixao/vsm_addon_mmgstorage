@@ -7,37 +7,24 @@ modded class mmg_storage_placeable_base
 
 	override void Open()
 	{
-		if(VSM_IsProcessing())
+        if (VSM_CanOpen())
         {
+            super.Open();
 
-            VirtualUtils.OnLocalPlayerSendMessage("Items are being generated, please wait...");
-            return;
-        }
-          
-        super.Open();
-
-        if (GetGame().IsServer())
-        {
-            VirtualStorageModule.GetModule().OnLoadVirtualStore(this);
+            if (GetGame().IsServer() && VSM_IsOpen())
+                VirtualStorageModule.GetModule().OnLoadVirtualStore(this);
         }
 	}
 
 	override void Close()
-	{
-
-		if(VSM_IsProcessing())
+	{ 
+        if (VSM_CanClose())
         {
-            VirtualUtils.OnLocalPlayerSendMessage("Items are being generated, please wait...");
-            return;
+            if (GetGame().IsServer())
+                VirtualStorageModule.GetModule().OnSaveVirtualStore(this);
+            
+            super.Close();
         }
-        
-        if (GetGame().IsServer())
-        {
-            VirtualStorageModule.GetModule().OnSaveVirtualStore(this);
-            VSM_StopAutoClose();
-        }
-
-        super.Close();
 	}
 
 	//! mesclar caracteristicas do storage para virtual
