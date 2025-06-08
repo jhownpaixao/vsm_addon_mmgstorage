@@ -94,7 +94,7 @@ modded class mmg_storage_placeable_base
         return false;
     }
 
-    bool CanDisplayAttachmentCategory( string category_name )
+    override bool CanDisplayAttachmentCategory( string category_name )
 	{
 		if (VSM_CanManipule())
             return super.CanDisplayAttachmentCategory(category_name);
@@ -158,13 +158,17 @@ modded class mmg_storage_placeable_base
     override void OnStoreSave(ParamsWriteContext ctx)
     {
         super.OnStoreSave(ctx);
-        ctx.Write(m_VSM_HasVirtualItems);
+
+        if(!VirtualStorageModule.GetModule().IsRemoving())
+            ctx.Write(m_VSM_HasVirtualItems);
     }
 
     override bool OnStoreLoad(ParamsReadContext ctx, int version)
     {
         if (!super.OnStoreLoad(ctx, version)) return false;
-        ctx.Read(m_VSM_HasVirtualItems);
+
+        if(!VirtualStorageModule.GetModule().IsNew())
+            ctx.Read(m_VSM_HasVirtualItems);
 
         return true;
     }
