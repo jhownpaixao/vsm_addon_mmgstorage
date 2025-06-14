@@ -8,7 +8,7 @@ modded class ActionMMGCloseAndOpen
 
 			if (crate.IsOpen())
 			{
-				if (!crate.VSM_CanClose())
+				if (crate.VSM_IsVirtualStorage() && !crate.VSM_CanClose())
 				{
 					VirtualUtils.SendMessageToPlayer(action_data.m_Player, "STR_VSM_NOT_CLOSE_CONTAINER");
 					return;
@@ -18,7 +18,7 @@ modded class ActionMMGCloseAndOpen
 			}
 			else
 			{
-				if (!crate.VSM_CanOpen())
+				if (crate.VSM_IsVirtualStorage() && !crate.VSM_CanOpen())
 				{
 					VirtualUtils.SendMessageToPlayer(action_data.m_Player, "STR_VSM_NOT_OPEN_CONTAINER");
 					return;
